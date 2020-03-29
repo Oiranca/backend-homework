@@ -10,6 +10,9 @@ var ID = function () {
     return '_' + Math.random().toString(36).substr(2, 9);
 };
 
+/*cada usuario tiene sus propias tareas y en la fecha taskCreate
+pondremos la fecha cuando tiene que realizarlas.
+En el idHome tenemos que traer el id Group*/
 
 const user = new User({
     name: 'Samuel',
