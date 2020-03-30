@@ -10,7 +10,7 @@ var ID = function () {
     return '_' + Math.random().toString(36).substr(2, 9);
 };
 
-/*cada usuario tiene sus propias tareas y en la fecha taskCreate
+/*cada usuario tiene sus propias tareas y en la fecha createDate
 pondremos la fecha cuando tiene que realizarlas.
 En el idHome tenemos que traer el id Group*/
 
@@ -21,7 +21,7 @@ const user = new User({
     image: null,
     role: 50,
     idHome: "5e80dff9c63d77613aef81bb",
-    taskUser: [{
+    tasks: [{
         id: ID(),
         description: 'tarea1',
         done: true,
