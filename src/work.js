@@ -10,79 +10,74 @@ var ID = function () {
     // after the decimal.
     return '_' + Math.random().toString(36).substr(2, 9);
 };
-/*
+
+//{ $addToSet: { <field>: { $each: [ <value1>, <value2> ... ] } } }
 async function work() {
-    const users = await User.findOne({
-        name: 'Samuel',
-    });
-
-    const  taskUsers = await User.updateMany({name:"Samuel"},{
-        $push:{
-            tasks:[{
-                id: ID(),
-                description: 'tarea3',
-                done: true,
-                createDate: Date()
-            }
-                , {
-                    id: ID(),
-                    description: 'tarea4',
-                    done: true,
-                    createDate: Date()
-                }]
+    let newTasks;
+    let b = {
+        id: ID(),
+        description: 'tarea3',
+        done: true,
+        createDate: Date()
+    };
+    let c = {
+        id: ID(),
+        description: 'tarea4',
+        done: true,
+        createDate: Date()
+    };
+    const users = await User.updateMany({
+            name: 'Samuel',
+        }, {
+            $push: {tasks: {$each: [b, c]}}
         }
-        $addToSet:{
-              tasks:[{
-               id: ID(),
-               description: 'tarea3',
-               done: true,
-               createDate: Date()
-           }
-               , {
-                   id: ID(),
-                   description: 'tarea4',
-                   done: true,
-                   createDate: Date()
-               }]
-        }
-       $push:{
-
-          tasks:{
-              $each:[{
-                  id: ID(),
-                  description: 'tarea3',
-                  done: true,
-                  createDate: Date()
-              }
-                  , {
-                      id: ID(),
-                      description: 'tarea4',
-                      done: true,
-                      createDate: Date()
-                  }
-
-              ]
-          }
-        }
-    });
+    );
 
 
-return taskUsers;
- // return users;
-}
+
+
+
+    /*   for (const tk of users) {
+
+           tk.tasks.push(b, c);
+           newTasks = tk;
+           console.log(newTasks);
+       }
+
+
+       const addTasks = await User.updateMany({
+           name: 'Samuel'
+       }, {
+           $set: {tasks:{tasks}=newTasks},
+       });
+       return addTasks;*/
+    return users;
+   }
 
 //ver en consola el resultado de una promesa
-work().then(function (result) {
-console.log(result);
-});
+    /*
+    work().then(function (result) {
 
-module.exports = work;*/
+    for(const as of result){
+        let b={
+            id: ID(),
+            description: 'tarea4',
+            done: true,
+            createDate: Date()
+        };
+        as.tasks.push(b);
+        console.log(as);
+    }
+
+    });*/
+
+    module.exports = work;
 
 /*
 const users = await User.findOne({
     name: 'Samuel',
 });*/
-
+/*
 async function idGropuf() {
 const idGp = await Controlgroup.findOne({
     name:'Nombre a elegir por el admin',
@@ -104,5 +99,5 @@ var idHome=idGropuf().then(function (result) {
 
 console.log('Esto es la variable'+idHome);
 
-module.exports = idGropuf;
+module.exports = idGropuf;*/
 
