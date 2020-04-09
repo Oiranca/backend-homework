@@ -1,8 +1,15 @@
-require('./connection/connection'); // importa el archivo de conexión
-const mongoose = require('mongoose');
-const work = require('./work');
-const create = require('./controller/controlUserandGroup');
+import express from 'express';
 
-//create();
+import routes from './routes/routes';
 
-work();
+
+// Create a new express application instance
+
+const app = express();
+app.disable('x-powered-by')
+
+routes(app);
+
+app.listen(3000, () => {
+  console.log('Connected and listen port:3000');
+});

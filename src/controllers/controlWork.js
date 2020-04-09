@@ -1,13 +1,7 @@
 const work = require('../work');
 
-
-
 const works = async () => {
-
-
-    await work();
-
-
+  await work();
 };
 
 works();
