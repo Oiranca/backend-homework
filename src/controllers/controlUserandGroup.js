@@ -1,7 +1,24 @@
+import bcrypt from 'bcrypt';
+
+// {
+//   userStatus: 'Create',
+//       name: 'Samuel',
+//     password: '12345',
+//     isCorrect: true,
+// }
+
 const createUser = (req, res) => {
-  res.status(200).json({
-    UserStatus: 'Create',
+  console.log('req.body', req.body);
+  
+  bcrypt.hash(req.body.password, 15, (err, hash) => {
+    // Store hash in your password DB.
+    if (err) {
+      console.log('Error a generar contraseña');
+    } else {
+      console.log('Todo ok', hash);
+    }
   });
+  res.send({ status: 'Ok', message: 'User Create' });
 };
 
 const deleteUser = (req, res) => {
@@ -9,9 +26,11 @@ const deleteUser = (req, res) => {
     UserStatus: 'Delete',
   });
 };
-const getUser = (req, res) => {res.status(200).json({
-  data:[]
-});};
+const getUser = (req, res) => {
+  res.status(200).json({
+    data: [],
+  });
+};
 const updateUser = (req, res) => {
   res.status(200).json({
     UserStatus: 'Update',
