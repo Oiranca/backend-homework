@@ -1,14 +1,13 @@
 //importamos mongoose
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const gruopSchema = new mongoose.Schema(
+export const groupSchema = new mongoose.Schema(
   {
-    name: String,
+    name: { type: String, required: true, unique: true },
   },
-  { collection: 'group' }
+  { collection: 'group' },
+  { timestamps: true }// poner fecha de creación y actualización
 ); //le podemos poner el nombre a la lista
 
-const Group = mongoose.model('Group', gruopSchema);
-
-module.exports = Group;
+const Group = mongoose.model('group', groupSchema);
