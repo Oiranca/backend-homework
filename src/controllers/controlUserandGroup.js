@@ -1,24 +1,21 @@
 import bcrypt from 'bcrypt';
 
-// {
-//   userStatus: 'Create',
-//       name: 'Samuel',
-//     password: '12345',
-//     isCorrect: true,
+// { ejemplo para postman
+//   "userStatus": "Create",
+//     "name": "Samuel",
+//     "password": "12345",
+//     "isCorrect": true
+//
 // }
 
-const createUser = (req, res) => {
-  console.log('req.body', req.body);
-  
-  bcrypt.hash(req.body.password, 15, (err, hash) => {
-    // Store hash in your password DB.
-    if (err) {
-      console.log('Error a generar contraseña');
-    } else {
-      console.log('Todo ok', hash);
-    }
-  });
-  res.send({ status: 'Ok', message: 'User Create' });
+const createUser = async (req, res) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 15);
+
+    res.send({ status: 'Ok', message: 'User Create' });
+  }catch (e) {
+    res.status(500).send({status:'Error', message:e.message})
+  }
 };
 
 const deleteUser = (req, res) => {
