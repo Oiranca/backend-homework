@@ -2,12 +2,12 @@
 
 import mongoose from 'mongoose';
 
-export const groupSchema = new mongoose.Schema(
+const groupSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
   },
-  { collection: 'group' },
+  { collection: 'Group' },
   { timestamps: true }// poner fecha de creación y actualización
 ); //le podemos poner el nombre a la lista
 
-const Group = mongoose.model('group', groupSchema);
+export const Group = mongoose.model('Group', groupSchema);

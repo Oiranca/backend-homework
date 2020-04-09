@@ -1,20 +1,35 @@
 import bcrypt from 'bcrypt';
+import { User } from '../model/user';
 
-// { ejemplo para postman
-//   "userStatus": "Create",
-//     "name": "Samuel",
-//     "password": "12345",
-//     "isCorrect": true
-//
-// }
 
+// ejemplo para postman
+// {    "name": "Samuel","userStatus": "Create",
+//     "email": "oiranca@gmail.com",  "name": "Samuel",
+//     "password":"Samuel",  "password": "12345",
+//     "role": 100,  "isCorrect": true
+//     "_idHome": { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true },
+//     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
+//   }
 const createUser = async (req, res) => {
   try {
-    const hash = await bcrypt.hash(req.body.password, 15);
+    const { name, email, password, role, _idHome, tasks } = req.body;
+
+    const hash = await bcrypt.hash(password, 15);
+    // se usa awati para primero crear el usuairo y luego enviar la respuesta
+    await User.create({
+      name, // Cuando el atributo tiene el mismo nombre que en el esquema
+      email,
+      password: hash,
+      role,
+      _idHome,
+      tasks,
+    });
 
     res.send({ status: 'Ok', message: 'User Create' });
-  }catch (e) {
-    res.status(500).send({status:'Error', message:e.message})
+  } catch (e) {
+    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+
+    res.status(500).send({ status: 'Error', message: e.message });
   }
 };
 
@@ -23,10 +38,14 @@ const deleteUser = (req, res) => {
     UserStatus: 'Delete',
   });
 };
-const getUser = (req, res) => {
-  res.status(200).json({
-    data: [],
-  });
+const getUser = async (req, res) => {
+  try {
+    const family = await User.find();
+    res.send({ status: 'Ok', message: 'User ok' });
+  } catch (e) {
+    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+    res.status(500).send({ status: 'Error', message: e.message });
+  }
 };
 const updateUser = (req, res) => {
   res.status(200).json({
