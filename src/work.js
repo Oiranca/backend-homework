@@ -37,20 +37,7 @@ async function work() {
 
 
 
-    /*   for (const tk of users) {
 
-           tk.tasks.push(b, c);
-           newTasks = tk;
-           console.log(newTasks);
-       }
-
-
-       const addTasks = await User.updateMany({
-           name: 'Samuel'
-       }, {
-           $set: {tasks:{tasks}=newTasks},
-       });
-       return addTasks;*/
     return users;
    }
 
@@ -73,31 +60,5 @@ async function work() {
 
     module.exports = work;
 
-/*
-const users = await User.findOne({
-    name: 'Samuel',
-});*/
-/*
-async function idGropuf() {
-const idGp = await Controlgroup.findOne({
-    name:'Nombre a elegir por el admin',
-});
 
-  return idGp._id;
-};
-
-idGropuf().then(function (result) {
-    console.log(result);
-    return result;
-});
-
-var idHome=idGropuf().then(function (result) {
-
-    return result;
-});
-
-
-console.log('Esto es la variable'+idHome);
-
-module.exports = idGropuf;*/
 

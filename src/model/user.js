@@ -1,22 +1,20 @@
 //importamos mongoose
 
-const mongoose = require('mongoose');
+// TODO:'mirar como insertar imagenes'
 
+import mongoose from 'mongoose';
 
+ const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: Number, enum: [100, 50] },
+    _idHome: { type: mongoose.Schema.Types.ObjectID,ref:'Group' , required:true},
+    tasks: {type: [{type:String}],default:['Sin tarea']},
+  },
+  { collection: 'Users' },
+  { timestamps: true }
+); //le podemos poner el nombre a la lista
 
-
-const userSchema = new mongoose.Schema({
-    name: String,
-    email:String,
-    password:String,
-    image:Buffer,
-    role:Number,
-    _idHome:mongoose.ObjectId,
-    tasks:Array
-
-},{collection:'users'});//le podemos poner el nombre a la lista
-
-const User = mongoose.model('User', userSchema);
-
-
-module.exports = User;
+export const User = mongoose.model('User', userSchema);
