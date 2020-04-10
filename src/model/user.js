@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: Number, enum: [100, 50] },
-    _idHome: { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true , required:true},
+    _idHome: { type: mongoose.Schema.Types.ObjectID,ref:'Group' , required:true},
     tasks: {type: [{type:String}],default:['Sin tarea']},
   },
   { collection: 'Users' },

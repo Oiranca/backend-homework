@@ -1,15 +1,36 @@
 import bcrypt from 'bcrypt';
 import { User } from '../model/user';
 
-
 // ejemplo para postman
-// {    "name": "Samuel","userStatus": "Create",
-//     "email": "oiranca@gmail.com",  "name": "Samuel",
-//     "password":"Samuel",  "password": "12345",
-//     "role": 100,  "isCorrect": true
+// {    "name": "Samuel",
+//     "email": "oiranca@gmail.com",
+//     "password":"Samuel",
+//     "role": 100,
 //     "_idHome": { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true },
 //     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
 //   }
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (user) {
+      // TODO: ??
+
+      const isCorrect = await bcrypt.compare(password, user.password);
+      if (isCorrect) {
+        res.send({ status: 'ok', data: {} });
+      } else {
+        res.status(403).send({ status: 'INVALID_PASSWORD', message: '' });
+      }
+    } else {
+      res.status(401).send({ status: 'USER_NOT_FOUND', message: '' });
+    }
+  } catch (e) {
+    res.status(500).send({ status: 'ERROR', message: e.message });
+  }
+};
 const createUser = async (req, res) => {
   try {
     const { name, email, password, role, _idHome, tasks } = req.body;
@@ -40,8 +61,8 @@ const deleteUser = (req, res) => {
 };
 const getUser = async (req, res) => {
   try {
-    const family = await User.find();
-    res.send({ status: 'Ok', message: 'User ok' });
+    const family = await User.find().select('name email _idhome role');
+    res.send({ status: 'Ok', data: family });
   } catch (e) {
     // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
     res.status(500).send({ status: 'Error', message: e.message });
@@ -58,6 +79,7 @@ module.exports = {
   deleteUser,
   getUser,
   updateUser,
+  login,
 };
 
 // // importamos mongoose

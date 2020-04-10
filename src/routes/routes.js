@@ -1,5 +1,5 @@
-import { router as userRoutes } from './userRoutes';
-import {router as groupRouter} from './groupRoutes'
+import { routerUsers as userRoutes } from './userRoutes';
+import {routerGroup as groupRouter} from './groupRoutes'
 
 export default (app) => {
   app.use('/api/users', userRoutes);

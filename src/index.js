@@ -4,6 +4,7 @@ import dotEnv from 'dotenv';
 import mongoose from 'mongoose';
 
 import routes from './routes/routes';
+
 dotEnv.config();
 const app = express();
 

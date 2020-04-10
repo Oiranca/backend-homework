@@ -1,11 +1,12 @@
 import express from 'express';
 import userController from '../controllers/controlUser';
 
-export const router = express.Router();
+export const routerUsers = express.Router();
 
-router.post('/create', userController.createUser);
-router.post('/update', userController.updateUser);
-router.post('/delete', userController.deleteUser);
-router.get('/family', userController.getUser);
+routerUsers.post('/login', userController.login);
+routerUsers.post('/create', userController.createUser);
+routerUsers.post('/update', userController.updateUser);
+routerUsers.post('/delete', userController.deleteUser);
+routerUsers.get('/family', userController.getUser);
 
 
