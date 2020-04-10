@@ -1,6 +1,7 @@
-import { Group } from '../model/group';
+import {Request,Response} from 'express';
+import Group  from '../model/group';
 
-const createHome = async (req, res) => {
+const createHome = async (req:Request, res:Response) => {
   try {
     const { name } = req.body;
     console.log(name);
@@ -17,12 +18,12 @@ const createHome = async (req, res) => {
   }
 };
 
-const deleteHome = (req, res) => {
+const deleteHome = (req:Request, res:Response) => {
   res.status(200).json({
     HomeStatus: 'Delete',
   });
 };
-const getHome = async (req, res) => {
+const getHome = async (req:Request, res:Response) => {
   try {
     const home = await Group.find();
     res.send({ status: 'Ok', data: home });
@@ -31,13 +32,13 @@ const getHome = async (req, res) => {
     res.status(500).send({ status: 'Error', message: e.message });
   }
 };
-const updateHome = (req, res) => {
+const updateHome = (req:Request, res:Response) => {
   res.status(200).json({
     groupStatus: 'Update',
   });
 };
 
-module.exports = {
+export default {
   createHome,
   deleteHome,
   getHome,
