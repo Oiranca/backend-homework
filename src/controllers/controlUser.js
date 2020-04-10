@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { User } from '../model/user';
+import jwt from 'jsonwebtoken';
 
 // ejemplo para postman
 // {    "name": "Samuel",
@@ -9,7 +10,7 @@ import { User } from '../model/user';
 //     "_idHome": { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true },
 //     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
 //   }
-
+const expiresIn = 60*10; // tiempo 10 minutod
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -20,7 +21,11 @@ const login = async (req, res) => {
 
       const isCorrect = await bcrypt.compare(password, user.password);
       if (isCorrect) {
-        res.send({ status: 'ok', data: {} });
+        const token = jwt.sign(
+          { userId: user._id, role: user.role },
+          process.env.JWT_SECRET,{expiresIn: expiresIn}// tiempo que tiene de validez el token
+        );
+        res.send({ status: 'ok', data: {token,expiresIn} });
       } else {
         res.status(403).send({ status: 'INVALID_PASSWORD', message: '' });
       }
