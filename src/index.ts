@@ -23,6 +23,8 @@ app.use(bodyParser.json());
 
 routes(app);
 
+
+
 // hemos puesto ! en env.... porque así le aseguramos a ts que siempre será un string
 const init = async () => {
   await mongoose.connect(process.env.MONGO!, {
