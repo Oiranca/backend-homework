@@ -1,24 +1,31 @@
-import express from 'express';
+import express, { Application } from 'express'; // para tyscript podemos hace una importación parcial para poner el tipo
 import bodyParser from 'body-parser';
 import dotEnv from 'dotenv';
 import mongoose from 'mongoose';
-
 import routes from './routes/routes';
 
 dotEnv.config();
-const app = express();
 
-app.disable('x-powered-by');
+// sobre escribiendo el interface Reques de expresss
+declare global {
+  namespace Express {
+    export interface Request {
+      sessionData: any;
+    }
+  }
+}
+
+const app: Application = express();
 
 //nos ayuda a parsear a json lo que llegue por POST
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 routes(app);
 
+// hemos puesto ! en env.... porque así le aseguramos a ts que siempre será un string
 const init = async () => {
-  await mongoose.connect(process.env.MONGO, {
+  await mongoose.connect(process.env.MONGO!, {
     dbName: 'pruebasDB',
     useNewUrlParser: true,
     useUnifiedTopology: true,
