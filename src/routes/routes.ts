@@ -1,8 +1,7 @@
 import {Application} from 'express'
-import  userRoutes  from './userRoutes';
-import  groupRouter from './groupRoutes'
+import routes from './appRoutes'
 
 export default (app :Application):void => {
-    app.use('/api/users', userRoutes);
-    app.use('/api/groups', groupRouter);
+    app.use('/api/users', routes);
+    app.use('/api/groups', routes);
 };

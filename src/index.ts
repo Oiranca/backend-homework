@@ -4,6 +4,7 @@ import dotEnv from 'dotenv';
 import mongoose from 'mongoose';
 import routes from './routes/routes';
 
+
 dotEnv.config();
 
 // sobre escribiendo el interface Reques de expresss
@@ -41,3 +42,7 @@ init()
   .catch((error) => {
     console.log('Mongodb error', error);
   });
+
+
+
+

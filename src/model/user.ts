@@ -1,4 +1,3 @@
-//importamos mongoose
 
 // TODO:'mirar como insertar imagenes'
 
