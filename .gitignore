@@ -1,3 +1,4 @@
 node_modules
 paquetes recomendados.txt
 .env
+.dist

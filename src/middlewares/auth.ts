@@ -38,7 +38,7 @@ const isAuth = (req: Request, res:Response, next:NextFunction):void =>  {
 
 const isAdmin = (req: Request, res:Response, next:NextFunction):void => {
   try {
-    const { role } = req.sessionData; // el role nos lo tre el sessionData que creamos en auth
+    const { role } = req.sessionData; // el role nos lo trae el sessionData que creamos en auth
     console.log(`role ${role}`);
 
     if (role!==100){
