@@ -11,7 +11,8 @@ routers.post('/delete',isValidHost,isAuth, userController.deleteUser);
 
 
 routers.post('/login',isValidHost, userController.login);
-routers.post('/register',isValidHost, userController.registerUser);
+routers.post('/register/admin',isValidHost, userController.registerUser);
+routers.post('/register/family',isValidHost, userController.registerUser);
 
 routers.post('/update',isValidHost,isAuth, userController.updateUser);
 

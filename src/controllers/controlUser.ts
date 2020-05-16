@@ -39,6 +39,8 @@ const login = async (req: Request, res: Response) => {
   } catch (e) {
     res.status(500).send({ status: 'ERROR', message: e.message });
   }
+
+
 };
 
 const registerUser = async (req: Request, res: Response) => {
@@ -46,31 +48,33 @@ const registerUser = async (req: Request, res: Response) => {
     const { name, email, password, role, tasks } = req.body;
 
     const hash = await bcrypt.hash(password, 15);
-    if (role !== 100) {
-      const _idHome = await registerHome.findOne({ name: req.body.adminEmail }).select('_idHome');
+    const _idHome = await registerHome.findOne({ name: req.body.adminEmail }).select('_idHome');
+
+    if (_idHome!==null) {
+
       // se usa awati para primero crear el usuairo y luego enviar la respuesta
       await User.create({
         name, // Cuando el atributo tiene el mismo nombre que en el esquema
         email,
         password: hash,
-        role,
+        role : 50,
         _idHome,
         tasks,
       });
     } else {
       //todo: se pone el nombre automático, pendiente de ponerlo para que lo elija
-      const nameHome = req.body.email;
+      const nameHome = req.body.home;
 
       await registerHome.create({
         name: nameHome,
       });
-      const _idHome = await registerHome.findOne({ name: req.body.email }).select('_id');
+      const _idHome = await registerHome.findOne({ name: req.body.home }).select('_id');
 
       await User.create({
         name, // Cuando el atributo tiene el mismo nombre que en el esquema
         email,
         password: hash,
-        role,
+        role : 100,
         _idHome,
         tasks,
       });
@@ -82,6 +86,8 @@ const registerUser = async (req: Request, res: Response) => {
 
     res.status(500).send({ status: 'Error', message: e.message });
   }
+
+
 };
 
 const deleteUser = async (req: Request, res: Response) => {
