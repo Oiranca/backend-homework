@@ -24,7 +24,7 @@ const login = async (req: Request, res: Response) => {
       const isCorrect = await bcrypt.compare(password, user.password);
       if (isCorrect) {
         const token = jwt.sign(
-          { userId: user._id, role: user.role},
+          { userId: user._id, role: user.role },
           process.env.JWT_SECRET!,
           { expiresIn: expiresIn } // tiempo que tiene de validez el token
         );
@@ -48,35 +48,34 @@ const registerUser = async (req: Request, res: Response) => {
     const { name, email, password, role, tasks } = req.body;
 
     const hash = await bcrypt.hash(password, 15);
-    const _idHome = await registerHome.findOne({ name: req.body.adminEmail }).select('_idHome');
+    let _idHome = await User.findOne({ email: req.body.adminEmail }).select({ _idHome: 1, _id: 0 });
 
-    if (_idHome!==null) {
+    if (_idHome !== null) {
 
-      // se usa awati para primero crear el usuairo y luego enviar la respuesta
+      // se usa await para primero crear el usuairo y luego enviar la respuesta
       await User.create({
         name, // Cuando el atributo tiene el mismo nombre que en el esquema
         email,
         password: hash,
-        role : 50,
+        role: 50,
         _idHome,
-        tasks,
+        tasks
       });
     } else {
       //todo: se pone el nombre automático, pendiente de ponerlo para que lo elija
       const nameHome = req.body.home;
 
       await registerHome.create({
-        name: nameHome,
+        name: nameHome
       });
       const _idHome = await registerHome.findOne({ name: req.body.home }).select('_id');
-
       await User.create({
         name, // Cuando el atributo tiene el mismo nombre que en el esquema
         email,
         password: hash,
-        role : 100,
+        role: 100,
         _idHome,
-        tasks,
+        tasks
       });
     }
 
@@ -110,15 +109,15 @@ const getUser = async (req: Request, res: Response) => {
   try {
     let family;
     const isAdmin = req.sessionData.role;
-    const idUserSearch=req.sessionData.userId;
+    const idUserSearch = req.sessionData.userId;
 
     if (isAdmin === 100) {
-      const idForSearch = await User.findOne({_id:idUserSearch}).select('_idHome');
-        family= await User.find({_idHome:idForSearch!._idHome}).select('name _id _idHome tasks');
+      const idForSearch = await User.findOne({ _id: idUserSearch }).select('_idHome');
+      family = await User.find({ _idHome: idForSearch!._idHome }).select('name _id _idHome tasks');
       res.send({ status: 'Ok', data: family });
     } else if (isAdmin === 50) {
-      family = await User.find({_id:idUserSearch}).select('name _id _idHome tasks');
-      res.send({ status: 'Ok', data:family});
+      family = await User.find({ _id: idUserSearch }).select('name _id _idHome tasks');
+      res.send({ status: 'Ok', data: family });
     }
   } catch (e) {
     // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
@@ -126,9 +125,32 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
+
+const getReport = async (req: Request, res: Response) => {
+  try {
+    let reportUsers;
+    const isAdmin = req.sessionData.role;
+    const idUserSearch = req.sessionData.userId;
+
+    if (isAdmin === 100) {
+      const idForSearch = await User.findOne({ _id: idUserSearch }).select('_idHome');
+      reportUsers = await User.find({ _idHome: idForSearch!._idHome }).select('name tasks');
+      res.send({ status: 'Ok', data: reportUsers });
+    } else if (isAdmin === 50) {
+      reportUsers = await User.find({ _id: idUserSearch }).select('name tasks');
+      res.send({ status: 'Ok', data: reportUsers });
+    }
+  } catch (e) {
+    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+    res.status(500).send({ status: 'Error', message: e.message });
+  }
+
+
+};
+
 const updateUser = (req: Request, res: Response) => {
   res.status(200).json({
-    UserStatus: 'Update',
+    UserStatus: 'Update'
   });
 };
 
@@ -136,6 +158,7 @@ export default {
   registerUser,
   deleteUser,
   getUser,
+  getReport,
   updateUser,
-  login,
+  login
 };
