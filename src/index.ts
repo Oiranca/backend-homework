@@ -32,6 +32,7 @@ const init = async () => {
     dbName: 'pruebasDB',
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   });
 };
 init()

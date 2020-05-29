@@ -13,7 +13,7 @@ import registerHome from '../model/group';
 //     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
 //   }
 
-const expiresIn = 60 * 10; // tiempo 10 minuto //TODO: Mirar que se anule el token al hacer logout
+const expiresIn = 60 * 100; // tiempo 10 minuto //TODO: Mirar que se anule el token al hacer logout
 
 const login = async (req: Request, res: Response) => {
   try {
@@ -45,7 +45,7 @@ const login = async (req: Request, res: Response) => {
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role, tasks } = req.body;
+    const { name, email, password, tasks } = req.body;
 
     const hash = await bcrypt.hash(password, 15);
     let _idHome = await User.findOne({ email: req.body.adminEmail }).select({ _idHome: 1, _id: 0 });
@@ -58,14 +58,13 @@ const registerUser = async (req: Request, res: Response) => {
         email,
         password: hash,
         role: 50,
-        _idHome,
+        _idHome: _idHome?._idHome,
         tasks
       });
     } else {
-      //todo: se pone el nombre automático, pendiente de ponerlo para que lo elija
-      const nameHome = req.body.home;
 
-      await registerHome.create({
+      const nameHome = req.body.home;
+       await registerHome.create({
         name: nameHome
       });
       const _idHome = await registerHome.findOne({ name: req.body.home }).select('_id');
@@ -74,7 +73,7 @@ const registerUser = async (req: Request, res: Response) => {
         email,
         password: hash,
         role: 100,
-        _idHome,
+        _idHome: _idHome?._id,
         tasks
       });
     }
@@ -83,7 +82,7 @@ const registerUser = async (req: Request, res: Response) => {
   } catch (e) {
     // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
 
-    res.status(500).send({ status: 'Error', message: e.message });
+    res.status(500).send({ status: 'Error', message: 'E11000' });
   }
 
 
@@ -113,7 +112,7 @@ const getUser = async (req: Request, res: Response) => {
 
     if (isAdmin === 100) {
       const idForSearch = await User.findOne({ _id: idUserSearch }).select('_idHome');
-      family = await User.find({ _idHome: idForSearch!._idHome }).select('name _id _idHome tasks');
+      family = await User.find({ _idHome: idForSearch!._idHome }).select({ name: 1, _id: 0, password: 1, email: 1 });
       res.send({ status: 'Ok', data: family });
     } else if (isAdmin === 50) {
       family = await User.find({ _id: idUserSearch }).select('name _id _idHome tasks');

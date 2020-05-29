@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import User from '../model/user';
-import jwt from 'jsonwebtoken';
-import registerHome from '../model/group';
-import registerTasks from '../model/tasks';
+import Group from '../model/group';
+
+import TasksModel from '../model/tasks';
+import tasks from '../model/tasks';
+import { Document } from 'mongoose';
 
 // ejemplo para postman
 // {    "name": "Samuel",
@@ -17,22 +19,31 @@ const createTasks = async (req: Request, res: Response) => {
   try {
     const { name, description } = req.body;
 
-    const _idHome = await User.findOne({ _id: req.sessionData.userId }).select({_idHome:1,_id:0});
+    const _idHome = await User.findOne({ _id: req.sessionData.userId }).select({ _idHome: 1, _id: 0 });
+
 
     if (_idHome !== null) {
-      await registerTasks.create({
+      const newTasks = new TasksModel({
         name,
         description,
-        _idHome
+        _idHome: _idHome._idHome
       });
+      await Group.findOneAndUpdate({ _id: _idHome._idHome }, { $push: { tasks: newTasks } });
+      res.send({ status: 'Ok', message: 'Task Create' });
+    }else {
+      res.status(500).send({ status: 'Error', message: 'Task Not Create' });
     }
-    res.send({ status: 'Ok', message: 'Task Create' });
+
+
+
+
+
+
   } catch (e) {
     // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
 
     res.status(500).send({ status: 'Error', message: e.message });
   }
-
 
 };
 
@@ -43,11 +54,11 @@ const getTasks = async (req: Request, res: Response) => {
     const idUserSearch = req.sessionData.userId;
 
     if (isAdmin === 100) {
-      const idForSearch = await User.findOne({ _id: idUserSearch }).select('_idHome');
-      tasks = await registerTasks.find({ _idHome: idForSearch!._idHome }).select('name');
+      const idForSearch = await User.findOne({ _id: idUserSearch }).select({ _idHome: 1, _id: 0 });
+      tasks = await TasksModel.find({ _idHome: idForSearch?._idHome }).select({ name: 1, _id: 0 });
       res.send({ status: 'Ok', data: tasks });
     } else if (isAdmin === 50) {
-      tasks = await registerTasks.find({ _id: idUserSearch }).select('name');
+      tasks = await TasksModel.find({ _id: idUserSearch }).select('name');
       res.send({ status: 'Ok', data: tasks });
     }
   } catch (e) {
@@ -57,8 +68,39 @@ const getTasks = async (req: Request, res: Response) => {
 };
 
 
+const assignTasks = async (req: Request, res: Response) => {
+  try {
+    const { name, emailFamily } = req.body;
+    let assig, taskAssign;
+    const idUserSearch = req.sessionData.userId;
+//Todo: Terminar la busqueda por id
+    //  const searchFamily = await User.findOne({ _id: idUserSearch }).select({ _idHome: 1, _id: 0 });
+    assig = await TasksModel.findOne({ name: name }).select('_id');
+
+    // quitar cuando lo una a angular
+    if (assig !== null) {
+      taskAssign = {
+        date: '01-01-01',
+        name: name,
+        idTask: assig._id
+      };
+      await User.findOneAndUpdate({ email: emailFamily }, { $push: { tasks: taskAssign } });
+      res.send({ status: 'Ok', data: assig });
+    } else {
+      res.status(500).send({ status: 'Error', message: 'Tasks no found' });
+    }
+
+
+  } catch (e) {
+    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+    res.status(500).send({ status: 'Error', message: e.message });
+  }
+};
+
+
 export default {
   createTasks,
-  getTasks
+  getTasks,
+  assignTasks
 
 };

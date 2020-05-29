@@ -14,7 +14,7 @@ export interface InterTasks extends Document{
 
 const tasksSchema: Schema = new Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true},
     description: { type: String, required: true},
     _idHome: { type: String, required:true},
   },
