@@ -1,10 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../model/user';
-import Group from '../model/group';
 
 import TasksModel from '../model/tasks';
-import tasks from '../model/tasks';
-import { Document } from 'mongoose';
 
 // ejemplo para postman
 // {    "name": "Samuel",
@@ -16,34 +13,35 @@ import { Document } from 'mongoose';
 //   }
 
 const createTasks = async (req: Request, res: Response) => {
-  try {
-    const { name, description } = req.body;
 
-    const _idHome = await User.findOne({ _id: req.sessionData.userId }).select({ _idHome: 1, _id: 0 });
+  const { name, description } = req.body;
 
+  // Create new tasks if not exist
 
-    if (_idHome !== null) {
-      const newTasks = new TasksModel({
-        name,
-        description,
-        _idHome: _idHome._idHome
-      });
-      await Group.findOneAndUpdate({ _id: _idHome._idHome }, { $push: { tasks: newTasks } });
-      res.send({ status: 'Ok', message: 'Task Create' });
-    }else {
-      res.status(500).send({ status: 'Error', message: 'Task Not Create' });
-    }
+  const newTasks = () => {
+    return new Promise(async (resolve, reject) => {
+      let _idHome, idCompare;
+      _idHome = await User.findOne({ _id: req.sessionData.userId }).select({ _idHome: 1, _id: 0 });
+      idCompare = await TasksModel.findOne({ name: name, _idHome: _idHome?._idHome }).select({ _id: 1 });
+      if (idCompare == undefined) {
+        console.log(`Id de la casa ${_idHome?._idHome}`);
+        console.log(`User Id ${req.sessionData.userId}`);
+        let tasksNotExist: String = _idHome!._idHome;
+        resolve(tasksNotExist);
+        res.send({ status: 'Ok', message: 'Task Create' });
+      } else {
+        let error: string = 'Not possible create new task';
+        reject(error);
+      }
+    });
+  };
 
+  newTasks().then(creatingTasks => TasksModel.create({
+    name,
+    description,
+    _idHome: creatingTasks
+  })).catch(error => res.status(500).send({ status: 'Error', message: error.message }));
 
-
-
-
-
-  } catch (e) {
-    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
-
-    res.status(500).send({ status: 'Error', message: e.message });
-  }
 
 };
 
