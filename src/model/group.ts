@@ -7,15 +7,13 @@ import { Document, model, Schema } from 'mongoose'; // importaciones paciales pa
 
 export interface InterGroup extends Document{
     name:string;
-  //tasks: string[];
-
 
 }
 
 const groupSchema: Schema = new Schema(
   {
     name: { type: String, required: true, unique: true },
-   // tasks: {type: [{type:Object}],default:['Sin tarea']},
+
 
   },
   { timestamps: true } // poner fecha de creación y actualización

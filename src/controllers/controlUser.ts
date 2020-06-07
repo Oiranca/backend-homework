@@ -4,45 +4,61 @@ import User from '../model/user';
 import jwt from 'jsonwebtoken';
 import registerHome from '../model/group';
 
-// ejemplo para postman
-// {    "name": "Samuel",
-//     "email": "oiranca@gmail.com",
-//     "password":"Samuel",
-//     "role": 100,
-//     "_idHome": { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true },
-//     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
-//   }
 
-const expiresIn = 60 * 100; // tiempo 10 minuto //TODO: Mirar que se anule el token al hacer logout
+const expiresIn = 60 * 100;  //TODO: Mirar que se anule el token al hacer logout
 
 const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (user) {
-      const isCorrect = await bcrypt.compare(password, user.password);
-      if (isCorrect) {
-        const token = jwt.sign(
-          { userId: user._id, role: user.role },
-          process.env.JWT_SECRET!,
-          { expiresIn: expiresIn } // tiempo que tiene de validez el token
-        );
+  const { email, password } = req.body;
+  const loginUser = () => {
+    return new Promise(async (resolve, reject) => {
+      interface error {
+        code: number;
+        status: string;
 
-        res.send({ status: 'ok', data: { token, expiresIn } });
+      };
+      const user = await User.findOne({ email });
+      if (user) {
+
+        const isCorrect = await bcrypt.compare(password, user.password);
+        if (isCorrect) {
+          const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET!,
+            { expiresIn: expiresIn } // tiempo que tiene de validez el token
+          );
+          resolve(token);
+
+        } else {
+
+          let invalidPassword: error = {
+            code: 403,
+            status: 'INVALID_PASSWORD'
+          };
+          reject(invalidPassword);
+
+        }
       } else {
-        res.status(403).send({ status: 'INVALID_PASSWORD', message: '' });
+
+        let invalidUser: error = {
+          code: 401,
+          status: 'USER_NOT_FOUND'
+        };
+
+        reject(invalidUser);
+
       }
-    } else {
-      res.status(401).send({ status: 'USER_NOT_FOUND', message: '' });
-    }
-  } catch (e) {
-    res.status(500).send({ status: 'ERROR', message: e.message });
-  }
+    });
+
+  };
+  loginUser().then(token => res.send({ status: 'ok', data: { token, expiresIn } })).catch(error => {
+    res.status(error.code).send({ status: error.status });
+
+
+  });
 
 
 };
-
 const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password, tasks } = req.body;
@@ -64,7 +80,7 @@ const registerUser = async (req: Request, res: Response) => {
     } else {
 
       const nameHome = req.body.home;
-       await registerHome.create({
+      await registerHome.create({
         name: nameHome
       });
       const _idHome = await registerHome.findOne({ name: req.body.home }).select('_id');
