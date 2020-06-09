@@ -20,22 +20,3 @@ routers.get('/profiles',isValidHost,isAuth, userController.getUser);
 routers.get('/reports', isValidHost,isAuth,userController.getReport);
 export default routers;
 
-// const appRoutes = [
-//   { path: '', component: LoginComponent, pathMatch: 'full' },
-//   {
-//     path: 'register', component: RegisterComponent, children: [
-//       { path: 'admin', component: RegisteradminComponent, pathMatch: 'full' },
-//       { path: 'family', component: RegisterfamilyComponent, pathMatch: 'full' }
-//
-//     ]
-//   },
-//   {
-//     path: 'tasks', component: TasksComponent, children: [
-//       { path: '', component: AssigntasksComponent, pathMatch: 'full' },
-//       { path: 'newtasks', component: CreatetasksComponent, pathMatch: 'full' }
-//     ]
-//   },
-//   { path: 'reports', component: ReportsComponent, pathMatch: 'full' },
-//   { path: 'profiles', component: ProfilesComponent, pathMatch: 'full' },
-//   { path: 'managefamily', component: ManagefamilyComponent, pathMatch: 'full' }
-// ];

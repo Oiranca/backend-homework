@@ -4,14 +4,7 @@ import User from '../model/user';
 import TasksModel from '../model/tasks';
 import PerformModel from '../model/tasksPerform';
 
-// ejemplo para postman
-// {    "name": "Samuel",
-//     "email": "oiranca@gmail.com",
-//     "password":"Samuel",
-//     "role": 100,
-//     "_idHome": { type: mongoose.Schema.Types.ObjectID,ref:'Group' , unique: true },
-//     "tasks": ["01/01/2020":{"Tarea1":"Lavar el coche","Tarea2":"Pasear al perro"}],
-//   }
+
 
 const createTasks = async (req: Request, res: Response) => {
 
@@ -73,44 +66,47 @@ const assignTasks = async (req: Request, res: Response) => {
 
   const checkTasks = () => {
     return new Promise(async (resolve, reject) => {
-      const searchTasksHome = await User.findOne({ _id: idUserSearch }).select({ _idHome: 1, _id: 0 });
-      const findFamily = await User.findOne({ email: emailFamily }).select({ _idHome: 1, _id: 1 });
-      const datePerform = await PerformModel.find({ _idUser: findFamily?._id }).select({
-        dateAssigned: 1,
-        _idTasks: 1
-      });
-      const assign = await TasksModel.findOne({ _idHome: findFamily?._idHome, name: name }).select({ _id: 1 });
+      try {
+        const searchTasksHome = await User.findOne({ _id: idUserSearch }).select({ _idHome: 1, _id: 0 });
+        const findFamily = await User.findOne({ email: emailFamily }).select({ _idHome: 1, _id: 1 });
+        const datePerform = await PerformModel.find({ _idUser: findFamily?._id }).select({
+          dateAssigned: 1,
+          _idTasks: 1
+        });
+        const assign = await TasksModel.findOne({ _idHome: findFamily?._idHome, name: name }).select({ _id: 1 });
 
-      let contDate: number = 0;
-      let contTask: number = 0;
-      let error = 'Not possible assign task';
+        let contDate: number = 0;
+        let contTask: number = 0;
+        let error = 'Not possible assign task';
 
-      for (let datePerformElement of datePerform) {
-        if (datePerformElement.dateAssigned === dateAssigned) {
-          if (datePerformElement._idTasks === assign?.id) {
-            contTask++;
+        for (let datePerformElement of datePerform) {
+          if (datePerformElement.dateAssigned === dateAssigned) {
+            if (datePerformElement._idTasks === assign?.id) {
+              contTask++;
+            }
+            contDate++;
           }
-          contDate++;
         }
-      }
-      if (contDate < 2 && contTask < 1) {
-        if (findFamily?._idHome === searchTasksHome?._idHome && assign!) {
-          await PerformModel.create({
-            _idTasks: assign?._id,
-            _idHome: findFamily?._idHome,
-            _idUser: findFamily?._id,
-            dateAssigned
-          });
+        if (contDate < 2 && contTask < 1) {
+          if (findFamily?._idHome === searchTasksHome?._idHome && assign!) {
+            await PerformModel.create({
+              _idTasks: assign?._id,
+              _idHome: findFamily?._idHome,
+              _idUser: findFamily?._id,
+              dateAssigned
+            });
 
-          resolve(assign);
+            resolve(assign);
+          } else {
+
+            reject(error);
+          }
         } else {
-
           reject(error);
         }
-      } else {
+      } catch (error) {
         reject(error);
       }
-
 
     });
   };
@@ -122,10 +118,53 @@ const assignTasks = async (req: Request, res: Response) => {
 
 };
 
+const confirmTasks = async (req: Request, res: Response) => {
+  const checkConfirmTask = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        let dataBody = req.body; // Cambiar para que coja el email del usuario logeado
+        const findUser = await User.findOne({ email: dataBody.emailFamily }).select({ _id: 1, _idHome: 1 });
+        const findTasks = await TasksModel.find({ name: dataBody.name, _idHome: findUser?._idHome }).select({ _id: 1 });
+        const checkTasks = await PerformModel.findOne({
+          _idUser: findUser?.id,
+          _idTasks: findTasks[0]._id,
+          dateAssigned: dataBody.dateAssigned
+        }).select({ _id: 1 });
+
+        if (checkTasks?._id) {
+          const checkRealized = await PerformModel.findById({ _id: checkTasks?._id }).select({ perform: 1, _id: 0 });
+          if (checkRealized?.perform !== true) {
+
+
+            await PerformModel.findByIdAndUpdate(checkTasks?._id, {
+              perform: true
+
+            });
+            resolve(res.send({
+              status: 'Ok',
+              data: 'Task realized'
+            }));
+          } else {
+            reject(res.status(500).send({ status: 'Error', message: 'Update not possible' }));
+          }
+
+        } else {
+          reject(res.status(500).send({ status: 'Error', message: 'Update not possible' }));
+        }
+      } catch (e) {
+        reject(res.status(500).send({ status: 'Error', message: 'Update not possible' }));
+      }
+    });
+  };
+  checkConfirmTask().then(result => result).catch(error => error);
+};
+
 
 export default {
   createTasks,
   getTasks,
-  assignTasks
+  assignTasks,
+  confirmTasks
 
 };
