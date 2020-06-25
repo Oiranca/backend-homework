@@ -3,7 +3,7 @@ import homeController from '../controllers/controlGroup';
 import userController from '../controllers/controlUser';
 import tasksController from '../controllers/controlTask';
 import {isValidHost,isAuth,isAdmin} from '../middlewares/auth';
-//TODO: Informes,
+
 const routers = express.Router();
 
 

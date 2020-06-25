@@ -4,7 +4,7 @@ import User from '../model/user';
 import jwt from 'jsonwebtoken';
 import registerHome from '../model/group';
 
-
+// TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
 const expiresIn = 60 * 100;  //TODO: Mirar que se anule el token al hacer logout
 
 const login = async (req: Request, res: Response) => {
@@ -96,7 +96,7 @@ const registerUser = async (req: Request, res: Response) => {
 
     res.send({ status: 'Ok', message: 'User Create' });
   } catch (e) {
-    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+
 
     res.status(500).send({ status: 'Error', message: 'E11000' });
   }
@@ -115,7 +115,7 @@ const deleteUser = async (req: Request, res: Response) => {
     const family = await User.find({ _idHome: req.body.id });
     res.send({ status: 'Ok', message: 'All data has been deleted' });
   } catch (e) {
-    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+
     res.status(500).send({ status: 'Error', message: e.message });
   }
 };
@@ -135,7 +135,7 @@ const getUser = async (req: Request, res: Response) => {
       res.send({ status: 'Ok', data: family });
     }
   } catch (e) {
-    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+
     res.status(500).send({ status: 'Error', message: e.message });
   }
 };
@@ -156,7 +156,7 @@ const getReport = async (req: Request, res: Response) => {
       res.send({ status: 'Ok', data: reportUsers });
     }
   } catch (e) {
-    // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
+
     res.status(500).send({ status: 'Error', message: e.message });
   }
 
