@@ -14,7 +14,7 @@ const isAuth = (req: Request, res:Response, next:NextFunction):void =>  {
   try {
     const { token } = req.headers; // el token me lo trae las cabeceras
     if (token) {
-      // le ponemos any porqeu sabemos que data es object
+      // le ponemos any porque sabemos que data es object
       const data :any = jwt.verify(token as string, process.env.JWT_SECRET!); // verifica que el token es válido
       // podemos escribir en el reques sin usar los reservados, nos sirve para verifar usuario para cargar el perfil con userid
       //ya que está validado con el token
@@ -39,7 +39,7 @@ const isAuth = (req: Request, res:Response, next:NextFunction):void =>  {
 const isAdmin = (req: Request, res:Response, next:NextFunction):void => {
   try {
     const { role } = req.sessionData; // el role nos lo trae el sessionData que creamos en auth
-    console.log(`role ${role}`);
+
 
     if (role!==100){
       throw {
