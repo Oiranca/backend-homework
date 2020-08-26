@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt';
 import User from '../model/user';
 import jwt from 'jsonwebtoken';
 import registerHome from '../model/group';
+import performsTasks from '../model/tasksPerform';
+import { rejects } from 'assert';
+import { type } from 'os';
 
 // TODO : Buscar y capturar con switch los errores para no pasar datos que no debemos en el mensaje
 const expiresIn = 60 * 100;  //TODO: Mirar que se anule el token al hacer logout
@@ -142,23 +145,79 @@ const getUser = async (req: Request, res: Response) => {
 
 
 const getReport = async (req: Request, res: Response) => {
-  try {
-    let reportUsers;
-    const isAdmin = req.sessionData.role;
-    const idUserSearch = req.sessionData.userId;
 
-    if (isAdmin === 100) {
-      const idForSearch = await User.findOne({ _id: idUserSearch }).select('_idHome');
-      reportUsers = await User.find({ _idHome: idForSearch!._idHome }).select('name tasks');
-      res.send({ status: 'Ok', data: reportUsers });
-    } else if (isAdmin === 50) {
-      reportUsers = await User.find({ _id: idUserSearch }).select('name tasks');
-      res.send({ status: 'Ok', data: reportUsers });
-    }
-  } catch (e) {
+  const printReport = () => {
+    return new Promise(async (resolve, reject) => {
 
-    res.status(500).send({ status: 'Error', message: e.message });
-  }
+      let reportUsers, userPerforms;
+      const isAdmin = req.sessionData.role;
+      const idUserSearch = req.sessionData.userId;
+      const dayToMilliSecond = 1000 * 60 * 60 * 24;
+      // Provisional para hacer pruebas
+      let dateFromTask = '2001-01-01';
+      let dateToTask = '2001-01-31';
+      let totalTasks= new Map<number, Object>();
+
+      //TODO hacer el recorrido para que busque día por día  y lo guarde en un map para
+      if (isAdmin === 100) {
+        const idForSearch = await User.findOne({ _id: idUserSearch }).select({ _idHome: 1, _id: 0 });
+        reportUsers = await User.find({ _idHome: idForSearch!._idHome }).select({ name: 1, _id: 1 });
+
+        if ((new Date(dateFromTask).getMonth() + 1) !== (new Date(dateToTask).getMonth() + 1)) {
+          reject('Data only one month');
+        } else {
+          let dateFromMillisecondTask = new Date(dateFromTask).getTime();
+          let dateToMillisecondTask = new Date(dateToTask).getTime();
+          let totalDaySearch: number = ((dateToMillisecondTask - dateFromMillisecondTask) / dayToMilliSecond) + 1;
+
+
+          for (let idUser of reportUsers) {
+            let dateToSearch;
+
+            for (let count: number = 0; count < totalDaySearch; count++) {
+              let dateToDate = new Date(dateFromTask);
+              let dateCount = dateToDate.getDay() + count;
+              dateToSearch = dateToDate.getFullYear().toString() + (dateToDate.getMonth() < 9 ? '-0' + (dateToDate.getMonth() + 1).toString() : '-' + (dateToDate.getMonth() + 1).toString()) +
+                (dateCount <= 9 ? '-0' + dateCount.toString() : '-' + dateCount.toString());
+
+              userPerforms = await performsTasks.find({
+                _idUser: idUser._id,
+                dateAssigned: dateToSearch!
+              }).select({ perform: 1, _idTasks: 1, _id: 0, _idUser: 1, dateAssigned: 1 });
+
+              if (userPerforms.length>0){
+
+                totalTasks.set(count, userPerforms[count])
+              }
+
+
+
+
+
+
+
+
+            }
+
+            for (let [countKey,value] of totalTasks){
+              console.log(`Key del Map ${ countKey } y valores ${value}`);
+            }
+            //userPerforms.length >= 0 ? resolve(totalTasks.entries()) : reject('Not found');
+          }
+        }
+      } else if (isAdmin === 50) {
+        reportUsers = await User.find({ _id: idUserSearch }).select('name tasks');
+        res.send({ status: 'Ok', data: reportUsers });
+      }
+
+
+    });
+
+  };
+
+  printReport().then(result => res.send({
+    status: 'Ok', data: result
+  })).catch(error => res.status(500).send({ status: 'Error', messenger: error }));
 
 
 };
